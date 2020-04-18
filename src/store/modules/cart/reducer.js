@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { ADD_TO_CART, REMOVE_FROM_CART } from './types';
+import { ADD_TO_CART, REMOVE_FROM_CART, UPDATE_AMOUNT } from './types';
 
 export default function cart(state = [], action) {
   switch (action.type) {
@@ -21,6 +21,16 @@ export default function cart(state = [], action) {
         const productIndex = draft.findIndex((p) => p.id === action.id);
         if (productIndex >= 0) draft.splice(productIndex, 1);
       });
+    case UPDATE_AMOUNT: {
+      if (action.amount <= 0) return state;
+
+      return produce(state, (draft) => {
+        const productIndex = draft.findIndex((p) => p.id === action.id);
+        if (productIndex >= 0) {
+          draft[productIndex].amount = Number(action.amount);
+        }
+      });
+    }
     default:
       return state;
   }
