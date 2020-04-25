@@ -1,8 +1,20 @@
-import { ADD_TO_CART, REMOVE_FROM_CART, UPDATE_AMOUNT } from './types';
+import {
+  ADD_TO_CART_REQUEST,
+  ADD_TO_CART_SUCCESS,
+  REMOVE_FROM_CART,
+  UPDATE_AMOUNT,
+} from './types';
 
-export function addToCart(product) {
+export function addToCartRequest(id) {
   return {
-    type: ADD_TO_CART,
+    type: ADD_TO_CART_REQUEST,
+    id,
+  };
+}
+
+export function addToCartSuccess(product) {
+  return {
+    type: ADD_TO_CART_SUCCESS,
     product,
   };
 }
