@@ -3,8 +3,8 @@ import { call, select, put, all, takeLatest } from 'redux-saga/effects';
 import { toast } from 'react-toastify';
 
 import api from '../../../services/api';
-import { addToCartSuccess, updateAmount } from './actions';
-import { ADD_TO_CART_REQUEST } from './types';
+import { addToCartSuccess, updateAmountSuccess } from './actions';
+import { ADD_TO_CART_REQUEST, UPDATE_AMOUNT_REQUEST } from './types';
 import { formatPrice } from '../../../util/format';
 
 function* addToCart({ id }) {
@@ -25,7 +25,7 @@ function* addToCart({ id }) {
   }
 
   if (productExists) {
-    yield put(updateAmount(id, amount));
+    yield put(updateAmountSuccess(id, amount));
   } else {
     const response = yield call(api.get, `/products/${id}`);
 
@@ -39,4 +39,22 @@ function* addToCart({ id }) {
   }
 }
 
-export default all([takeLatest(ADD_TO_CART_REQUEST, addToCart)]);
+function* updateAmount({ id, amount }) {
+  if (amount <= 0) return;
+
+  const stock = yield call(api.get, `/stock/${id}`);
+
+  const stockAmount = stock.data.amount;
+
+  if (amount > stockAmount) {
+    toast.error('Quantidade solicitada fora do estoque');
+    return;
+  }
+
+  yield put(updateAmountSuccess(id, amount));
+}
+
+export default all([
+  takeLatest(ADD_TO_CART_REQUEST, addToCart),
+  takeLatest(UPDATE_AMOUNT_REQUEST, updateAmount),
+]);
